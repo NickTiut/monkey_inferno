@@ -6,26 +6,37 @@ submitRequest = function( req_obj, api_call ) {
         beforeSend: function ( ) {
             //remove the previous results and disable the submit button
             $('#results').empty();
-            $("#submitButton").attr("disabled", "disabled");
+            $("#submitButton").bind('click', false);
         },
         success:function(result) {
-            var list = result["word_dict"];
-            for (var key in list) {
-                // check to see if key is owned by list object and not by any of it's ancestors
-                if (list.hasOwnProperty(key)) { 
-                    var x = $('<div/>', {
-                                id: "word" + key,
-                                className: 'foobar',
-                                html: key+': '+list[key]
-                            });
-                    $('#results').append(x);
+            //get the list from the result
+            var list = result["word_list"];
+            //add result title element
+            if (list.length > 0) {
+                $('#results').append($('<div/>', {
+                                            id: "result_title",
+                                            class: 'center result_title',
+                                            html: "Gaze upon the magical results:"
+                                    }));
+            }
+            //add each result element
+            for (var i = 0; i < list.length; i++) {
+                if (list[i].length == 2) {
+                    var new_word_div = $('<div/>', {
+                                            id: "word" + list[i][0],
+                                            class: 'center results',
+                                            html: "'" + list[i][0] + "' appeared " + list[i][1] + " time(s)."
+                                        });
+                    $('#results').append(new_word_div);
                 }
             }
-            $("#submitButton").removeAttr("disabled");
+            //re-enable submit
+            $("#submitButton").unbind('click', false);
         },
         error:function() {
-            //alert("failure");
-            $("#submitButton").removeAttr("disabled");
+            //show error alert and re-enable submit
+            alert("The minions have made a mistake! Please try again.");
+            $("#submitButton").unbind('click', false);
         }
     });
 }
